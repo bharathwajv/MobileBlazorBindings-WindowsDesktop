@@ -1,15 +1,30 @@
 ﻿@inject AppState AppState
+@inject Microsoft.JSInterop.IJSRuntime jsRuntime
 
 <div class="my-component">
-    This Blazor Web component is defined in the <strong>RazorClassLibrarySample</strong> package.
+    This Blazor Web component is defined in the <strong>@greeting</strong> package.
     <div>Count = @AppState.Counter</div>
     <button @onclick="DoIncrement">+1</button>
+        <div>@greeting</div>
 </div>
 
 @code
 {
+    string greeting;
     void DoIncrement()
     {
+        MessagingCenter.Subscribe<AppState, string>(this, "greeting_message", (sender, value) =>
+           {
+               greeting = $"Welcome {value}";
+               this.InvokeAsync(() => this.StateHasChanged());
+           });
         AppState.Counter++;
+        SendMessage();
     }
+    public void SendMessage()
+{
+     string valueToSend = "Hi from web";
+     MessagingCenter.Send(this, "greeting_message", valueToSend);
+}
+
 }
